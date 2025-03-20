@@ -13,9 +13,11 @@ fi
 echo "Lyssnar på port $PORT för anslutningar..."
 
 while true; do
-    # Använd socat för att lyssna på port 25565
-    socat -d -d TCP-LISTEN:$PORT,reuseaddr,fork EXEC:"true" > /dev/null 2>&1
-    echo "Anslutning upptäckt! Startar servern..."
-    $START_SCRIPT &
-    sleep 30
+    # Använd netcat för att lyssna på port 25565 och hålla anslutningen öppen i 5 sekunder
+    nc -l -p $PORT -w 5 > /dev/null 2>&1 && {
+        echo "Anslutning upptäckt! Startar servern..."
+        $START_SCRIPT &
+        # Vänta 60 sekunder för att ge servern tid att starta
+        sleep 60
+    }
 done
